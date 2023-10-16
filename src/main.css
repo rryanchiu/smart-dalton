@@ -121,7 +121,7 @@ body[theme=dark] {
     resize: vertical;
 }
 
-@media (max-width: 765px) {
+@media (max-width: 1024px) {
     .container {
         padding: 0 !important;
     }
@@ -157,10 +157,12 @@ body[theme=dark] {
     }
 
 }
+
 .loading {
     animation: rotate 2s infinite linear;
 
 }
+
 @keyframes rotate {
     from {
         transform: rotate(0deg);
@@ -234,4 +236,12 @@ body[theme=dark] {
     100% {
         transform: translateX(0);
     }
+}
+
+pre {
+    border-radius: 0.5rem;
+    padding: 1rem !important;
+}
+code{
+    padding:1rem;
 }

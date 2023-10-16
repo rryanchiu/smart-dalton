@@ -6,6 +6,7 @@ import {atom} from "nanostores";
 const defaultConfig = () => {
     return {
         apikey: '',
+        baseUrl: 'https://api.openai.com',
         model: 'gpt-3.5-turbo',
         top_p: 0.8,
         temperature: 0.8,
@@ -43,7 +44,7 @@ export const getConfiguration = async (key: string) => {
     return conf;
 }
 
-export const switchConversation = async (cid:string) => {
+export const switchConversation = async (cid: string) => {
     const localConfig = await db.getItem(cid)
     if (!localConfig) {
         const defaultConfig = await getDefaultConfig()

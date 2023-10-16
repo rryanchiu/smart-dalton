@@ -1,17 +1,5 @@
 import {EventStreamContentType, fetchEventSource,} from "@microsoft/fetch-event-source";
-
-import {useStore} from '@nanostores/react'
-import {configurations} from "../stores";
 import {ConfigurationProps} from "../stores/types/configuration.ts";
-
-export interface OpenAIListModelResponse {
-    object: string;
-    data: Array<{
-        id: string;
-        object: string;
-        root: string;
-    }>;
-}
 
 
 export interface RequestMessage {
@@ -32,13 +20,22 @@ export interface OpenAIReq {
     messages: RequestMessage[];
     settings: ConfigurationProps;
     config: OpenAIConfig;
-
-    onUpdate?: (message: string, chunk: string) => void;
+    // event
+    onMessage?: (message: string, chunk: string) => void;
     onFinish: (message: string) => void;
     onError?: (err: Error) => void;
-    onController?: (controller: AbortController) => void;
 }
 
+export interface OpenAIRes {
+    error?: OpenAIErrorMsg;
+}
+
+export interface OpenAIErrorMsg {
+    message?: string
+    code?: string;
+    param?: string;
+    type?: string;
+}
 
 const chat = async (req: OpenAIReq) => {
     if (!req.settings.apikey) {
@@ -57,22 +54,20 @@ const chat = async (req: OpenAIReq) => {
     }));
 
 
-    const requestPayload = {
+    const requestBody = {
         messages,
-       ...req.config
+        ...req.config
     };
 
-    console.log("[Request] openai payload: ", JSON.stringify(requestPayload));
+    console.log("[Request] openai payload: ", JSON.stringify(requestBody));
 
-    const shouldStream = !!req.config.stream;
     const controller = new AbortController();
-    req.onController?.(controller);
 
     try {
-        const chatPath = "https://api.openai.com/v1/chat/completions";
+        const chatPath = req.settings.baseUrl + "/v1/chat/completions";
         const chatPayload = {
             method: "POST",
-            body: JSON.stringify(requestPayload),
+            body: JSON.stringify(requestBody),
             signal: controller.signal,
             headers: headers,
         };
@@ -83,92 +78,87 @@ const chat = async (req: OpenAIReq) => {
             60000,
         );
 
-        if (shouldStream) {
-            let responseText = "";
-            let finished = false;
+        let message = "";
+        let finished = false;
 
-            const finish = () => {
-                if (!finished) {
-                    req.onFinish(responseText);
-                    finished = true;
+        const close = () => {
+            if (!finished) {
+                req.onFinish(message);
+                finished = true;
+            }
+        };
+
+        controller.signal.onabort = close;
+
+        fetchEventSource(chatPath, {
+            ...chatPayload,
+            async onopen(res) {
+                clearTimeout(requestTimeoutId);
+                const contentType = res.headers.get("content-type");
+                if (contentType?.startsWith("text/plain")) {
+                    message = await res.clone().text();
+                    return close();
                 }
-            };
 
-            controller.signal.onabort = finish;
-
-            fetchEventSource(chatPath, {
-                ...chatPayload,
-                async onopen(res) {
-                    clearTimeout(requestTimeoutId);
-                    const contentType = res.headers.get("content-type");
-                    if (contentType?.startsWith("text/plain")) {
-                        responseText = await res.clone().text();
-                        return finish();
-                    }
-
-                    if (
-                        !res.ok ||
-                        !res.headers
-                            .get("content-type")
-                            ?.startsWith(EventStreamContentType) ||
-                        res.status !== 200
-                    ) {
-                        const responseTexts = [responseText];
-                        let extraInfo = await res.clone().text();
-                        try {
-                            const resJson = await res.clone().json();
-                            // extraInfo = prettyObject(resJson);
-                            extraInfo = resJson;
-                        } catch {
-                            console.error('failed')
-                        }
-
-                        if (res.status === 401) {
-                            responseTexts.push("认证失败");
-                        }
-
-                        if (extraInfo) {
-                            responseTexts.push(extraInfo);
-                        }
-
-                        responseText = responseTexts.join("\n\n");
-
-                        return finish();
-                    }
-                },
-                onmessage(msg) {
-                    if (msg.data === "[DONE]" || finished) {
-                        return finish();
-                    }
-                    const text = msg.data;
+                if (
+                    !res.ok ||
+                    !res.headers
+                        .get("content-type")
+                        ?.startsWith(EventStreamContentType) ||
+                    res.status !== 200
+                ) {
+                    const responseMessages = [message];
+                    const responseBody: string = await res.clone().text();
                     try {
-                        const json = JSON.parse(text);
-                        const delta = json.choices[0].delta.content;
-                        if (delta) {
-                            responseText += delta;
-                            req.onUpdate?.(responseText, delta);
+                        const responseJson: OpenAIRes = await res.clone().json();
+                        if (responseJson && responseJson.error) {
+                            message = responseJson.error.message || 'Unknown error.';
                         }
-                    } catch (e) {
-                        console.error("[Request] parse error", text, msg);
+                        return close();
+                    } catch {
+                        console.error('failed')
                     }
-                },
-                onclose() {
-                    finish();
-                },
-                onerror(e) {
-                    req.onError?.(e);
-                    throw e;
-                },
-                openWhenHidden: true,
-            });
-        } else {
-            const res = await fetch(chatPath, chatPayload);
-            clearTimeout(requestTimeoutId);
+                    if (res.status === 401) {
+                        responseMessages.push("认证失败");
+                    }
+                    if (res.status === 404) {
+                        responseMessages.push("接口故障");
+                    }
 
-            const resJson = await res.json();
-            const message = resJson.choices?.at(0)?.message?.content
-            req.onFinish(message);
-        }
+                    if (responseBody) {
+                        responseMessages.push(responseBody)
+                    }
+
+                    message = responseMessages.join("\r\n");
+
+                    return close();
+                }
+            },
+            onmessage(msg) {
+                if (msg.data === "[DONE]" || finished) {
+                    return close();
+                }
+                const text = msg.data;
+                try {
+                    const json = JSON.parse(text);
+                    const delta = json.choices[0].delta.content;
+                    if (delta) {
+                        message += delta;
+                        req.onMessage?.(message, delta);
+                    }
+                } catch (e) {
+                    console.error("[Request] parse error", text, msg);
+                }
+            },
+            onclose() {
+                close();
+            },
+            onerror(e) {
+                req.onError?.(e);
+                throw e;
+            },
+            openWhenHidden: true,
+        });
     } catch (e) {
         console.error("failed to make a chat request", e);
         req.onError?.(e as Error);

@@ -23,12 +23,12 @@ export const Button = (props: Props) => {
     const buttonVariantClass = () => ({
         normal: 'cursor-pointer bg-gray-1 hover:bg-gray-2 active:bg-gray-1 dark:bg-dark-1 dark:hover:bg-dark-2 dark:active:bg-dark-1 hover:bg-gray-1 bg-gray-1 ',
         bordered: 'cursor-pointer b bg-gray-1 hover:bg-gray-2 active:bg-gray-1 dark:bg-dark-1 dark:hover:bg-dark-2 dark:active:bg-dark-1 hover:bg-gray-1 bg-gray-1 ',
-        primary: 'cursor-pointer bg-blue-600 hover:bg-blue-500 active:bg-blue-600 text-white',
-        success: 'cursor-pointer bg-green-4 hover:bg-green-5 active:hover:bg-green-4  dark:bg-teal-700 hover:dark:bg-teal-600 active:dark:bg-teal-700 text-white  border-transparent hover:(bg-teal-700 dark:bg-teal-800)',
+        primary: 'cursor-pointer bg-blue-700 hover:bg-blue-500 active:bg-blue-600 text-white',
+        success: 'cursor-pointer bg-green-6 hover:bg-green-5 active:hover:bg-green-4  dark:bg-teal-700 hover:dark:bg-teal-600 active:dark:bg-teal-700 text-white  border-transparent hover:(bg-teal-700 dark:bg-teal-800)',
         danger: 'cursor-pointer bg-[#F53F3F] hover:bg-[#F76560] active:bg-[#F53F3F] color-white ',
     }[props.type || 'normal'])
     const iconSizeClass = () => ({
-        sm: 'text-base',
+        sm: 'text-sm',
         md: 'text-md',
         lg: 'text-lg',
     }[props.size || 'md'])

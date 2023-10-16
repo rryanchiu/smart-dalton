@@ -1,18 +1,20 @@
-import React, {useEffect} from 'react'
+import React, {useEffect, useRef} from 'react'
 import {Button} from "../ui";
 
-import {
-    currentConversationId,
-    conversations
-} from "../../stores/conversationStore.tsx"
+import {conversations, currentConversationId} from "../../stores/conversationStore.tsx"
 
+import {useFullscreen} from '../../hooks'
 import {useStore} from '@nanostores/react'
 import {chat, OpenAIConfig, RequestMessage} from "../../utils/openai.tsx";
-import {configurations, addMessage} from "../../stores";
+import {addMessage, configurations} from "../../stores";
 import {MessageProps} from "../../stores/types/message.ts";
-import {getMessagesByConversationId} from "../../stores/messageStore.tsx"
+import {getMessagesByConversationId, deleteMessagesByConversationId} from "../../stores/messageStore.tsx"
+import MessageViewer from "./MessageViewer.tsx";
+import {useI18n} from "../../hooks";
 
 const Chat = () => {
+    const [fullscreen, setFullscreen] = useFullscreen()
+
     const [inputValue, setInputValue] = React.useState('')
     const conversationId = useStore(currentConversationId);
     const conversation = useStore(conversations);
@@ -21,7 +23,10 @@ const Chat = () => {
     const [steamingMessage, setStreamingMessage] = React.useState('');
     const [streaming, setStreaming] = React.useState(false);
 
+    const {t} = useI18n()
+
     const [messages, setMessages] = React.useState<MessageProps[]>([]);
+
 
     useEffect(() => {
         configurations.set(conf)
@@ -47,11 +52,10 @@ const Chat = () => {
     const getConversationName = (cid: string) => {
         for (const item of conversation) {
             if (item.id === cid) {
-                return item.title;
+                return item.title ? item.title : t('conversationname');
             }
         }
-        return cid;
-
+        return '';
     }
     const showSide = (elementId: string) => {
         const element = document.getElementById(elementId);
@@ -59,7 +63,7 @@ const Chat = () => {
             element.classList.add('side-show');
         }
     }
-    const addMsg = (role: 'user' | 'assistant' | 'system', message: string) => {
+    const addMsg = (role: 'user' | 'assistant' | 'system', message: string, code?: number) => {
         const rowId = 'id_' + Date.now()
         const messageBody: MessageProps = {
             id: rowId,
@@ -67,18 +71,29 @@ const Chat = () => {
             messageId: '',
             createTime: Date.now(),
             role: role,
-            content: message
+            content: message,
+            code: code || 0
         }
         addMessage(conversationId, messageBody)
+        init()
     }
     const sendMessage = () => {
+        const finalMsg = inputValue.trim();
+        if (!finalMsg || finalMsg === '') {
+            return;
+        }
+        if (!conf.apikey) {
+            addMsg('assistant', t('tipsline1'))
+            return
+        }
         setStreaming(true)
         const sendMessages: RequestMessage[] = [];
+
         sendMessages.push({
             role: 'user',
-            content: inputValue
+            content: finalMsg
         })
-        addMsg('user', inputValue)
+        addMsg('user', finalMsg)
         setInputValue('')
         const config: OpenAIConfig = {
             stream: true,
@@ -92,89 +107,59 @@ const Chat = () => {
             messages: sendMessages,
             settings: conf,
             config: config,
-            onUpdate(message) {
-                // botMessage.streaming = true;
-                // if (message) {
-                //     botMessage.content = message;
-                // }
-                // get().updateCurrentSession((session) => {
-                //     session.messages = session.messages.concat();
-                // });
-                console.log(message)
+            onMessage(message) {
+                console.log('update',message)
                 setStreamingMessage(message)
             },
             onFinish(message) {
                 addMsg('assistant', message)
                 console.log('finish', message)
-                init()
                 setStreaming(false)
+                init()
             },
             onError(error) {
-                console.log(error)
-                init()
+                console.log('error', error)
                 setStreaming(false)
+                init()
             }
         })
     }
     return (
-        <div className={'h-full flex flex-col'}>
+        <div className={'h-full flex flex-col '}>
             <header className='header'>
                 <div className={"flex gap-1.5 items-center"}>
                     <Button className={'autoshow'} icon='ri-menu-line'
                             onClick={() => showSide('side-l')}/>
                     <b>{getConversationName(conversationId)}</b></div>
-                <div className={"flex gap-1.5"}>
-                    <Button icon='ri-eraser-line'/>
+                <div className={"flex gap-1.5 text-sm"}>
+                    <Button icon={fullscreen ? 'ri-fullscreen-exit-line' : 'ri-fullscreen-line'}
+                            title={t('fullscreen')}
+                            onClick={() => {
+                                setFullscreen(!fullscreen)
+                            }}/>
+                    <Button icon='ri-delete-bin-2-line' title={t('clearallmessages')} onClick={async () => {
+                        await deleteMessagesByConversationId(conversationId);
+                        setMessages([])
+                    }}/>
                     <Button className={'autoshow'} icon='ri-settings-4-line' onClick={() => showSide('side-r')}/>
                 </div>
             </header>
-            <div style={{flex: '1 1'}} className="relative h-full overflow-x-none overflow-y-auto ">
-                <div className={'flex  h-full w-full gap-1.5 '}>
-                    {messages.length <= 0 ?
-                        <div className={'card m-auto color-gray-6 dark:color-gray-2 text-sm font-500 gap-1.2'}>
-                            <span>✨本服务需要OpenAI API Key才能访问</span>
-                        </div>
-                        : <div className={'chatbox'}>
-                            {messages.map((msg, index) => (
-                                <div  >
-                                    {msg.role === 'user' &&
-                                        <div key={index}
-                                             className={'chatitem bg-white'}>
-                                            <span>{msg.content}</span>
-                                        </div>}
-                                    {msg.role === 'assistant' &&
-                                        <div key={index}
-                                             className={'chatitem bg-gray-1'}>
-                                            <span>{msg.content}</span>
-                                        </div>}
-                                </div>
-                            ))}
-                            <div
-                                className={'chatitem bg-gray-1'}
-                                style={{display: streaming ? '' : 'none'}}>
-                                {
-                                    steamingMessage ? <span>{steamingMessage}</span> :
-                                        <span className={'color-gray-3'}>Thinking...</span>
-                                }
-                            </div>
-                        </div>
-                    }
-                </div>
-            </div>
+            <MessageViewer  messages={messages} streaming={streaming} streamingMessage={steamingMessage}/>
             <div style={{position: 'sticky'}} className="absolute bottom-0 w-full border-t-1 p3 dark:border-dark-1">
                   <textarea
                       id='inputtext'
                       className={'chattext inputtext resize-none'}
                       style={{height: height}}
                       disabled={streaming}
-                      placeholder={streaming ? 'Thinking...' : 'Ask me anything😀'}
+                      placeholder={streaming ? t('thinking') : t('askmeanything')}
                       value={inputValue}
                       onChange={handleTextareaChange}/>
                 {/*<Button className="absolute left-5 bottom-7  "*/}
                 {/*        type={'normal'} size={'sm'} icon='ri-image-line' onClick={() => sendMessage()}/>*/}
-                <Button className={'absolute right-5 bottom-7 '}
+                <Button className={'absolute right-5 bottom-7  '}
                         disabled={streaming}
-                        type={'normal'} size={'sm'} icon='ri-send-plane-line' onClick={() => sendMessage()}/>
+                        type={'success'} size={'sm'} icon='ri-mail-send-fill'
+                        onClick={() => sendMessage()}/>
             </div>
         </div>
     )

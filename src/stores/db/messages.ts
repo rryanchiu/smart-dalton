@@ -1,9 +1,8 @@
-import {get, set, update, del, UseStore, createStore, entries} from 'idb-keyval'
+import {createStore, del, entries, get, set, update, UseStore} from 'idb-keyval'
+import type {MessageProps} from "../types/message.ts";
 
 const store: UseStore = createStore('messages', 'keyval');
 
-
-import type {MessageProps} from "../types/message.ts";
 
 // type ConversationRecord = Record<string, string | number | boolean>
 

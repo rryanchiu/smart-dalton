@@ -2,20 +2,19 @@ import './Index.css'
 import ConversationList from "./components/ConversationList.tsx";
 import Chat from "./components/Chat.tsx";
 import SettingPanel from "./components/SettingPanel.tsx";
-import {Sider, Content} from './ui'
+import {Content, Sider} from './ui'
 
 const Index = () => {
     return (
-        // <main className="py-[8vh] max-w-[80ch] mx-auto dark:prose-invert">
-        <main className="container">
-            <div className='layout'>
-                <Sider id="side-l" direction="left" className="hidden md:block">
+        <main id='container' className="container h-full w-screen flex  ">
+            <div id='layout' className='layout'>
+                <Sider direction={'left'}>
                     <ConversationList/>
                 </Sider>
-                <Content className="md:block">
+                <Content className="overflow-hidden">
                     <Chat/>
                 </Content>
-                <Sider id="side-r" direction="right" className="hidden md:block">
+                <Sider direction={'right'}>
                     <SettingPanel/>
                 </Sider>
             </div>

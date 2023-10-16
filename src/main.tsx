@@ -12,8 +12,8 @@ import React from "react";
 import 'react-toastify/dist/ReactToastify.min.css';
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
-   <React.StrictMode>
-       <ToastContainer />
-       <Index/>
-   </React.StrictMode>
+    <React.StrictMode>
+        <ToastContainer/>
+        <Index/>
+    </React.StrictMode>
 )

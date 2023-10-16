@@ -1,9 +1,8 @@
-import {get, set, update, del, UseStore, createStore, values} from 'idb-keyval'
+import {createStore, del, get, set, update, UseStore, values} from 'idb-keyval'
+import type {ConversationProps} from "../types/conversation.ts";
 
 const store: UseStore = createStore('conversations', 'keyval');
 
-
-import type {ConversationProps} from "../types/conversation.ts";
 
 // type ConversationRecord = Record<string, string | number | boolean>
 
@@ -31,7 +30,7 @@ const deleteItem = async (key: string) => {
 
 const list = async () => {
     if (store) {
-        const entriesData:ConversationProps[] = await values(store)
+        const entriesData: ConversationProps[] = await values(store)
         return entriesData.reverse()
     }
     return null

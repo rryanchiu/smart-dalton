@@ -2,27 +2,29 @@ import {Button} from "../ui";
 import {useStore} from '@nanostores/react'
 
 import {
+    addConversation,
     conversations,
     currentConversationId,
+    deleteConversation,
     fetchData,
-    updateConversation,
-    addConversation,
     selectConversation,
-    deleteConversation
+    updateConversation
 } from "../../stores/conversationStore.tsx"
 
-import {useEffect, useState} from "react";
+import {useI18n} from '../../hooks'
+import {useEffect, useRef, useState} from "react";
 import {ConversationProps} from "../../stores/types/conversation.ts";
 import {configurations, getConfiguration} from "../../stores";
 
-const ConversationList =  () => {
+const ConversationList = () => {
     const conversation = useStore(conversations)
     const conversationId = useStore(currentConversationId)
-
+    const {t} = useI18n();
     const reloadConfig = async () => {
         console.log('conversationId changed', conversationId)
         configurations.set(await getConfiguration(conversationId))
     }
+
     useEffect(() => {
         reloadConfig()
     }, [conversationId])
@@ -35,7 +37,11 @@ const ConversationList =  () => {
     }
     const delConversation = async (id: string) => {
         await deleteConversation(id);
+        if (conversations.get().length <= 0) {
+            await addConversation()
+        }
         conversations.set(await fetchData());
+        selectConversation(conversations.get()[0].id)
     }
 
     const hideSide = () => {
@@ -53,32 +59,42 @@ const ConversationList =  () => {
         await updateConversation(data);
         conversations.set(await fetchData());
     }
+    const handleChangeEditValue = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setTimeout(() => {
+            setEditValue(e.target.value)
+        }, 100)
+    }
+
 
     return (
         <div className={'h-full flex flex-col'}>
             <header className='header'>
-                <span className="pagetitle font-700 ml2">Dalton</span>
-                <div className={'flex gap-1.5'}>
-                    <Button icon={'ri-add-line'} text={'New'} onClick={newConversation}/>
+                <div className={'flex items-center gap-0'}>
+                    <img src="/dalton.svg" alt="" className={'w-7.5'}/>
+                    <span className="pagetitle font-700 ml2 color-dark-2 dark:color-gray-1 ">Dalton</span>
+                </div>
+                <div className={'flex gap-1.5 text-sm'}>
+                    <Button icon={'ri-add-line'} text={t('newconversation')} onClick={newConversation}/>
                     <Button className='autoshow' icon={'ri-close-line'} onClick={hideSide}/>
                 </div>
             </header>
-            <div className={"list grow"}>
-                {conversation.map((item,index) => (
+            <div className={"list grow "}>
+                {conversation.map((item, index) => (
                     <div key={index}
-                        className=
-                             {['listitem flex justify-between gap-1.5',
+                         className=
+                             {['listitem flex justify-between gap-1.5 text-sm items-center ',
                                  conversationId === item.id ? 'selected' : '',
                              ].join(' ')}
                          onClick={() => {
                              selectConversation(item.id);
                          }}>
-                        {editingId !== item.id && <div>{item.title}</div>
+                        {editingId !== item.id &&
+                            <div className={'line-height-[30px]'}>{item.title || t('conversationname')}</div>
                         }
                         {editingId === item.id &&
-                            <input className={"bg-white dark:bg-dark px2 py0 rd-2 w-[160px]"}
+                            <input className={"bg-white dark:bg-dark px2 py1 rd-2 w-[160px]"}
                                    value={editValue}
-                                   onChange={(e) => setEditValue(e.target.value)}
+                                   onInput={(e) => setEditValue(e.target.value)}
                             />}
 
                         {editingId === item.id &&

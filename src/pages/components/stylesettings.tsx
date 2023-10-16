@@ -1,4 +1,2 @@
-const settings = {
-
-}
+const settings = {}
 export default settings;

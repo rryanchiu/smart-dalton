@@ -2,6 +2,7 @@ const bots = {
     OpenAI: {
         enabled: true,
         params: [
+            {field: 'baseUrl', defaultValue: 'https://api.openai.com', label: 'Base URL', type: 'text', placeholder: ''},
             {field: 'apikey', defaultValue: '', label: 'API Key', type: 'text', placeholder: ''},
             {
                 field: 'model',
@@ -22,10 +23,12 @@ const bots = {
             },
             {
                 field: 'temperature', label: 'temperature', type: 'number', defaultValue: 0.8,
+                tips:'数值越大，答案越随机',
                 step: 0.1,
             },
             {
                 field: 'top_p', label: 'top_p', type: 'number', defaultValue: 1.0,
+                tips:'数值越大，回答越多样',
                 step: 0.1,
             },
             {field: 'max_tokens', label: 'max_tokens', type: 'number', defaultValue: 2048, min: 0, max: 10000},
@@ -37,7 +40,7 @@ const bots = {
                 step: 0.1,
                 min: -2.0,
                 max: 2.0,
-                tips: '值越大，越有可能扩展到新话题'
+                tips: '数值越大，越有可能讨论到新话题'
             },
             {
                 field: 'frequency_penalty',
@@ -47,7 +50,7 @@ const bots = {
                 defaultValue: 0.8,
                 min: -2.0,
                 max: 2.0,
-                tips: '值越大，越有可能降低重复字词'
+                tips: '数值越大，重复的字数越低'
             }
         ]
     }

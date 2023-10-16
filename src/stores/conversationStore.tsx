@@ -48,7 +48,7 @@ export const addConversation = async (data?: ConversationProps) => {
     if (!data) {
         data = {
             id: rowId,
-            title: '新的对话',
+            title: '',
             createTime: Date.now(),
             updateTime: Date.now()
         }

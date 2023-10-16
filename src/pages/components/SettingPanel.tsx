@@ -1,14 +1,13 @@
 import {toast} from 'react-toastify';
-
-2
 import bots from "./bots.tsx";
 
 // import {toast} from 'react-toastify';
 import {useTheme} from '../../hooks'
 import {Button} from "../ui";
-import {currentConversationId, configurations, saveConfiguration, conversations} from "../../stores";
+import {configurations, currentConversationId, switchLanguage, saveConfiguration, currentLanguage} from "../../stores";
 import {useStore} from "@nanostores/react";
 import {useEffect} from "react";
+import {useI18n} from "../../hooks/useI18n.tsx";
 
 
 interface BotItemProp {
@@ -30,12 +29,16 @@ const Item = (props: BotItemProp) => {
 
     const {init, data} = props
     const field = init.field;
-
+    const getDataFieldValue = () => {
+        return data[field] || ''
+    }
     return (
         <div className="p1">
-            <div className="mb1 color-gray">{init.label}</div>
+            <div className="mb1 color-gray gap-1.2 flex justify-between">{init.label}
+                {init.tips && <i className={'ri-question-line text-[15px]'} title={init.tips}> </i>}</div>
+
             {init.type === 'text' && <input className={'bg-gray-1 p1 pl3 pr3 rd w-full dark:bg-dark-1'} type="text"
-                                            value={data[field] ? data[field] : ''}
+                                            value={getDataFieldValue() ? data[field] : ''}
                                             autoComplete={'off'}
                                             onChange={e => props.changeValue(field, e.currentTarget.value)}
                                             placeholder={init.placeholder}/>}
@@ -63,11 +66,14 @@ const Item = (props: BotItemProp) => {
 const SettingPanel = () => {
     const [theme, setTheme] = useTheme()
     const configuration = useStore(configurations)
+    const $currentLanguage = useStore(currentLanguage)
     const conversationId = useStore(currentConversationId)
 
-    useEffect(()=>{
+    const {t} = useI18n()
+
+    useEffect(() => {
         configurations.set(configuration)
-    },[configuration])
+    }, [configuration])
 
     const switchTheme = () => {
         const t = theme === 'dark' ? 'light' : 'dark'
@@ -108,21 +114,13 @@ const SettingPanel = () => {
     return (
         <div className={'h-full flex flex-col'}>
             <header className='header'>
-                <b>Settings</b>
+                <b>{t('settings')}</b>
                 <Button className="autoshow" onClick={hideSide} icon={'ri-close-line'}/>
             </header>
-            <div className="h-full px2 mt-2 overflow-x-hidden overflow-y-auto text-sm">
+            <div className="h-full px2 py2 overflow-x-hidden overflow-y-auto text-sm">
                 <div className="font-700 m1">OpenAI</div>
-                {/*<div className="flex flex-col p1 border-b pb5 mb3">*/}
-                {/*    <div className="mb1 color-gray">用户设定</div>*/}
-                    {/*<Button icon={'ri-settings-line'} size={'sm'}></Button>*/}
-                    {/*<input className={'bg-gray-1 p1 pl3 pr3 rd w-full dark:bg-dark-1'} type="text"*/}
-                    {/*       value={''}*/}
-                    {/*       autoComplete={'off'}*/}
-                    {/*       placeholder={'自定义用户设定'}/>*/}
-                {/*</div>*/}
                 <div className="flex flex-col ">
-                    {bots.OpenAI.params.map((item,index) => (
+                    {bots.OpenAI.params.map((item, index) => (
                         <Item key={index} init={item} data={configuration} changeValue={changeValue}/>
                     ))}
                 </div>
@@ -132,9 +130,13 @@ const SettingPanel = () => {
                 <div className={'flex gap-1.5'}>
                     <Button icon={theme == 'light' ? 'ri-moon-line' : 'ri-sun-line'} onClick={switchTheme}
                             title={theme == 'light' ? 'Switch to dark' : 'Switch to light'}/>
-                    <Button icon='ri-translate'/>
+                    <Button icon='ri-translate' onClick={() => {
+                        switchLanguage($currentLanguage === 'zh_cn' ? 'en_us' : 'zh_cn');
+                    }}/>
+                    <Button text={'😀'} onClick={() => {window.open('https://rryan.me');}}/>
                 </div>
-                <Button icon='ri-check-line' text={'Save'} type={'success'} onClick={saveConfig}
+                <Button icon='ri-check-line' type={'success'} onClick={saveConfig}
+                        text={t('save')}
                         className={' right-3'}/>
             </div>
         </div>

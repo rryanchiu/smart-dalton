@@ -4,7 +4,7 @@ export interface MessageProps {
     messageId: string
     createTime?: number
     role?: 'system' | 'user' | 'assistant'
-    code?: string
+    code?: number
     msg?: string
     content?: string
 }

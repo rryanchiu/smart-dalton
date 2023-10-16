@@ -1,4 +1,6 @@
 export interface ConfigurationProps {
+    baseUrl?: string
+    currentLocale?: ''
     model?: string
     top_p?: number
     temperature?: number

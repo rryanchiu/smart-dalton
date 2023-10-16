@@ -1,4 +1,4 @@
-import {get, set, update, del, entries, UseStore, createStore} from 'idb-keyval'
+import {createStore, del, entries, get, set, update, UseStore} from 'idb-keyval'
 import {ConfigurationProps} from "../types/configuration.ts";
 
 const store: UseStore = createStore('configurations', 'keyval');
