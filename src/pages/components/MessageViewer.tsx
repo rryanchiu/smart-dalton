@@ -1,14 +1,13 @@
 import {MessageProps} from "../../stores/types/message.ts";
 import {useI18n} from "../../hooks";
+import Markdown from "./Markdown.tsx";
+import {useEffect, useRef} from "react";
 
 interface MessageViewerProps {
     messages: MessageProps[]
     streaming: boolean
     streamingMessage: string
 }
-
-import Markdown from "./Markdown.tsx";
-import {useEffect, useRef} from "react";
 
 const MessageViewer = (props: MessageViewerProps) => {
     const messages = props.messages || []

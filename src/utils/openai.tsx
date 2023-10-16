@@ -59,7 +59,6 @@ const chat = async (req: OpenAIReq) => {
         ...req.config
     };
 
-    console.log("[Request] openai payload: ", JSON.stringify(requestBody));
 
     const controller = new AbortController();
 

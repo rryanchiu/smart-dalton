@@ -23,6 +23,7 @@ const Markdown = (props: MarkdownProps) => {
                     const {children, className, node, ...rest} = props
                     const match = /language-(\w+)/.exec(className || '')
                     return match ? (
+                        //@ts-ignore
                         <SyntaxHighlighter
                             {...rest}
                             children={String(children).replace(/\n$/, '')}

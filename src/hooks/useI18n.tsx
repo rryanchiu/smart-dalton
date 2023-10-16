@@ -8,7 +8,6 @@ export const useI18n = () => {
     const [currentLocale, setCurrentLocale] = useState(en_us)
 
     currentLanguage.listen((value) => {
-        console.log('currentLanguage', value)
         setCurrentLocale(value === 'zh_cn' ? zh_cn : en_us)
         switchLanguage(value)
     })

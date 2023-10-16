@@ -6,8 +6,8 @@ import {Content, Sider} from './ui'
 
 const Index = () => {
     return (
-        <main id='container' className="container h-full w-screen flex  ">
-            <div id='layout' className='layout'>
+        <main id='container' className="container h-full w-screen flex fullscreen ">
+            <div id='layout' className='layout fullscreenlayhout'>
                 <Sider direction={'left'}>
                     <ConversationList/>
                 </Sider>

@@ -12,7 +12,7 @@ import {
 } from "../../stores/conversationStore.tsx"
 
 import {useI18n} from '../../hooks'
-import {useEffect, useRef, useState} from "react";
+import {useEffect, useState} from "react";
 import {ConversationProps} from "../../stores/types/conversation.ts";
 import {configurations, getConfiguration} from "../../stores";
 
@@ -21,7 +21,6 @@ const ConversationList = () => {
     const conversationId = useStore(currentConversationId)
     const {t} = useI18n();
     const reloadConfig = async () => {
-        console.log('conversationId changed', conversationId)
         configurations.set(await getConfiguration(conversationId))
     }
 
@@ -53,16 +52,10 @@ const ConversationList = () => {
 
 
     const updateConversationTitle = async (newTitle: string, item: ConversationProps) => {
-        console.log(newTitle)
         const data: ConversationProps = {...item, title: newTitle}
         setEditingId('')
         await updateConversation(data);
         conversations.set(await fetchData());
-    }
-    const handleChangeEditValue = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setTimeout(() => {
-            setEditValue(e.target.value)
-        }, 100)
     }
 
 
@@ -94,7 +87,8 @@ const ConversationList = () => {
                         {editingId === item.id &&
                             <input className={"bg-white dark:bg-dark px2 py1 rd-2 w-[160px]"}
                                    value={editValue}
-                                   onInput={(e) => setEditValue(e.target.value)}
+                                   //@ts-ignore
+                                   onInput={(e) =>{ setEditValue(e.target.value)}}
                             />}
 
                         {editingId === item.id &&

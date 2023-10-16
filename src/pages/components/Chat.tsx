@@ -1,16 +1,15 @@
-import React, {useEffect, useRef} from 'react'
+import React, {useEffect} from 'react'
 import {Button} from "../ui";
 
 import {conversations, currentConversationId} from "../../stores/conversationStore.tsx"
 
-import {useFullscreen} from '../../hooks'
+import {useFullscreen, useI18n} from '../../hooks'
 import {useStore} from '@nanostores/react'
 import {chat, OpenAIConfig, RequestMessage} from "../../utils/openai.tsx";
 import {addMessage, configurations} from "../../stores";
 import {MessageProps} from "../../stores/types/message.ts";
-import {getMessagesByConversationId, deleteMessagesByConversationId} from "../../stores/messageStore.tsx"
+import {deleteMessagesByConversationId, getMessagesByConversationId} from "../../stores/messageStore.tsx"
 import MessageViewer from "./MessageViewer.tsx";
-import {useI18n} from "../../hooks";
 
 const Chat = () => {
     const [fullscreen, setFullscreen] = useFullscreen()
@@ -42,8 +41,7 @@ const Chat = () => {
     }
 
     const handleTextareaChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
-        const {value, rows} = event.target;
-        console.log(event.target.scrollHeight)
+        const {value, } = event.target;
         setInputValue(value);
         setHeight('inherit')
         setHeight(event.target.scrollHeight > 144 ? '144px' : event.target.scrollHeight + 'px')
@@ -108,17 +106,15 @@ const Chat = () => {
             settings: conf,
             config: config,
             onMessage(message) {
-                console.log('update',message)
                 setStreamingMessage(message)
             },
             onFinish(message) {
                 addMsg('assistant', message)
-                console.log('finish', message)
                 setStreaming(false)
                 init()
             },
             onError(error) {
-                console.log('error', error)
+                console.error(error)
                 setStreaming(false)
                 init()
             }
@@ -132,10 +128,10 @@ const Chat = () => {
                             onClick={() => showSide('side-l')}/>
                     <b>{getConversationName(conversationId)}</b></div>
                 <div className={"flex gap-1.5 text-sm"}>
-                    <Button icon={fullscreen ? 'ri-fullscreen-exit-line' : 'ri-fullscreen-line'}
+                    <Button icon={fullscreen === 'true' ? 'ri-fullscreen-exit-line' : 'ri-fullscreen-line'}
                             title={t('fullscreen')}
                             onClick={() => {
-                                setFullscreen(!fullscreen)
+                                setFullscreen(fullscreen === 'true' ? 'false' : 'true')
                             }}/>
                     <Button icon='ri-delete-bin-2-line' title={t('clearallmessages')} onClick={async () => {
                         await deleteMessagesByConversationId(conversationId);
@@ -144,7 +140,7 @@ const Chat = () => {
                     <Button className={'autoshow'} icon='ri-settings-4-line' onClick={() => showSide('side-r')}/>
                 </div>
             </header>
-            <MessageViewer  messages={messages} streaming={streaming} streamingMessage={steamingMessage}/>
+            <MessageViewer messages={messages} streaming={streaming} streamingMessage={steamingMessage}/>
             <div style={{position: 'sticky'}} className="absolute bottom-0 w-full border-t-1 p3 dark:border-dark-1">
                   <textarea
                       id='inputtext'

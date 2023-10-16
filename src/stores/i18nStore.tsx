@@ -17,5 +17,5 @@ export const getCurrentLanguage = async () => {
 
 export const switchLanguage = action(currentLanguage, 'switchLanguage', async (store, language) => {
     await db.setItem('currentLanguage', language)
-    currentLanguage.set(language)
+    store.set(language)
 })

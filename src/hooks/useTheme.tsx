@@ -20,8 +20,7 @@ export const useTheme = () => {
         if (localTheme) {
             setTheme(localTheme === 'dark' ? 'dark' : 'light')
         } else {
-            const colorSchema = window.matchMedia('(prefers-color-scheme: dark)')
-            setTheme(colorSchema ? 'dark' : 'light')
+            setTheme( 'light')
         }
     }, [])
 
