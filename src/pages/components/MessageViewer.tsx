@@ -64,7 +64,7 @@ const MessageViewer = (props: MessageViewerProps) => {
                             {
                                 steamingMessage ?
                                     <Markdown markdown={steamingMessage}/> :
-                                    <span className={'color-gray-3'}>Thinking...</span>
+                                    <span className={'color-gray-3'}>{t('thinking')}</span>
                             }
                         </div>
                     </div>

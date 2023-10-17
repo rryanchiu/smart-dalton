@@ -7,6 +7,7 @@ import {
     currentConversationId,
     deleteConversation,
     fetchData,
+    initConversations,
     selectConversation,
     updateConversation
 } from "../../stores/conversationStore.tsx"
@@ -26,6 +27,7 @@ const ConversationList = () => {
     const newConversation = async () => {
         const data = await addConversation();
         currentConversationId.set(data.id)
+        initConversations()
     }
     const delConversation = async (id: string) => {
         await deleteConversation(id);
