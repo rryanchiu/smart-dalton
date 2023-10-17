@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react'
+import React, {useEffect, useRef} from 'react'
 import {Button} from "../ui";
 
 import {conversations, currentConversationId} from "../../stores/conversationStore.tsx"
@@ -10,6 +10,7 @@ import {addMessage, configurations} from "../../stores";
 import {MessageProps} from "../../stores/types/message.ts";
 import {deleteMessagesByConversationId, getMessagesByConversationId} from "../../stores/messageStore.tsx"
 import MessageViewer from "./MessageViewer.tsx";
+import KeyboardEventHandler from 'react-keyboard-event-handler';
 
 const Chat = () => {
     const [fullscreen, setFullscreen] = useFullscreen()
@@ -21,7 +22,7 @@ const Chat = () => {
     const [height, setHeight] = React.useState('50px');
     const [steamingMessage, setStreamingMessage] = React.useState('');
     const [streaming, setStreaming] = React.useState(false);
-
+    const inputRef: React.RefObject<HTMLTextAreaElement> = useRef<HTMLTextAreaElement>(null);
     const {t} = useI18n()
 
     const [messages, setMessages] = React.useState<MessageProps[]>([]);
@@ -40,12 +41,26 @@ const Chat = () => {
         setMessages(msgs);
     }
 
-    const handleTextareaChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
-        const {value, } = event.target;
+    const handleTextareaChange = (value: string) => {
         setInputValue(value);
-        setHeight('inherit')
-        setHeight(event.target.scrollHeight > 144 ? '144px' : event.target.scrollHeight + 'px')
+        if (!inputRef.current) {
+            return
+        }
+
+
+        console.log(inputRef.current.scrollHeight)
+        console.log(inputRef.current.clientHeight)
+        console.log(inputRef.current.offsetHeight)
+
+        if (inputRef.current.scrollHeight > 144 && height != '144px') {
+            setHeight('144px')
+            return;
+        }
+        if (inputRef.current.scrollHeight > inputRef.current.offsetHeight) {
+            setHeight(inputRef.current.scrollHeight + 'px')
+        }
     };
+
 
     const getConversationName = (cid: string) => {
         for (const item of conversation) {
@@ -86,6 +101,16 @@ const Chat = () => {
         }
         setStreaming(true)
         const sendMessages: RequestMessage[] = [];
+        const msgs = messages.slice(-10);
+        for (const msgItem of msgs) {
+            if (!msgItem.role || !msgItem.content) {
+                continue
+            }
+            sendMessages.push({
+                role: msgItem.role,
+                content: msgItem.content
+            })
+        }
 
         sendMessages.push({
             role: 'user',
@@ -93,6 +118,9 @@ const Chat = () => {
         })
         addMsg('user', finalMsg)
         setInputValue('')
+        if(inputRef.current) {
+            inputRef.current.value=''
+        }
         const config: OpenAIConfig = {
             stream: true,
             top_p: conf.top_p,
@@ -111,6 +139,7 @@ const Chat = () => {
             onFinish(message) {
                 addMsg('assistant', message)
                 setStreaming(false)
+                setStreamingMessage("")
                 init()
             },
             onError(error) {
@@ -128,7 +157,7 @@ const Chat = () => {
                             onClick={() => showSide('side-l')}/>
                     <b>{getConversationName(conversationId)}</b></div>
                 <div className={"flex gap-1.5 text-sm"}>
-                    <Button icon={fullscreen === 'true' ? 'ri-fullscreen-exit-line' : 'ri-fullscreen-line'}
+                    <Button icon={fullscreen === 'false' ? 'ri-fullscreen-exit-line' : 'ri-fullscreen-line'}
                             title={t('fullscreen')}
                             onClick={() => {
                                 setFullscreen(fullscreen === 'true' ? 'false' : 'true')
@@ -142,20 +171,27 @@ const Chat = () => {
             </header>
             <MessageViewer messages={messages} streaming={streaming} streamingMessage={steamingMessage}/>
             <div style={{position: 'sticky'}} className="absolute bottom-0 w-full border-t-1 p3 dark:border-dark-1">
-                  <textarea
-                      id='inputtext'
-                      className={'chattext inputtext resize-none'}
-                      style={{height: height}}
-                      disabled={streaming}
-                      placeholder={streaming ? t('thinking') : t('askmeanything')}
-                      value={inputValue}
-                      onChange={handleTextareaChange}/>
-                {/*<Button className="absolute left-5 bottom-7  "*/}
-                {/*        type={'normal'} size={'sm'} icon='ri-image-line' onClick={() => sendMessage()}/>*/}
+                <KeyboardEventHandler
+                    handleKeys={['ctrl + enter']}
+                    onKeyEvent={() => {
+                       sendMessage()
+                    }}>
+                <textarea
+                    ref={inputRef}
+                    className={'chattext inputtext resize-none'}
+                    style={{height: height}}
+                    disabled={streaming}
+                    autoComplete="off"
+                    placeholder={streaming ? t('thinking') : t('askmeanything')}
+                    onInput={() => {
+                        const val = !inputRef.current ?'':inputRef.current.value;
+                        handleTextareaChange(val);
+                    }}/>
                 <Button className={'absolute right-5 bottom-7  '}
                         disabled={streaming}
                         type={'success'} size={'sm'} icon='ri-mail-send-fill'
                         onClick={() => sendMessage()}/>
+                </KeyboardEventHandler>
             </div>
         </div>
     )

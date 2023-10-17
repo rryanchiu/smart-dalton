@@ -62,9 +62,12 @@ const ConversationList = () => {
     return (
         <div className={'h-full flex flex-col'}>
             <header className='header'>
-                <div className={'flex items-center gap-0'}>
-                    <img src="/dalton.svg" alt="" className={'w-7.5'}/>
-                    <span className="pagetitle font-700 ml2 color-dark-2 dark:color-gray-1 ">Dalton</span>
+                <div className={'flex  items-center gap-0'}>
+                    <img src="/dalton.svg" alt="" className={'w-10.5'}/>
+                    <div className={'flex flex-col gap-0 '}>
+                        <span className="pagetitle line-height-[1.4rem] mt-[.3rem] font-700 ml2 color-dark-2 dark:color-gray-1 ">Dalton</span>
+                        <span className=" font-500 ml2 color-gray text-[.7rem] ">Web UI for ChatGPT</span>
+                    </div>
                 </div>
                 <div className={'flex gap-1.5 text-sm'}>
                     <Button icon={'ri-add-line'} text={t('newconversation')} onClick={newConversation}/>

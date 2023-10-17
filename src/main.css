@@ -242,6 +242,23 @@ pre {
     border-radius: 0.5rem;
     padding: 1rem !important;
 }
-code{
-    padding:1rem;
+
+input[type="range"] {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    height: .1rem;
+    background-size: cover;
+    outline: none;
+    cursor: pointer;
+}
+
+::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-size: cover;
+    background-color: #e5e7ec;
+    width: 1rem;
+    height: 1rem;
+    border-radius: 50%;
 }

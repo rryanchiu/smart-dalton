@@ -16,18 +16,23 @@ const MessageViewer = (props: MessageViewerProps) => {
     const {t} = useI18n()
     const messageRef = useRef<HTMLDivElement>(null);
 
-    useEffect(() => {
+    const scrollToBottom = () => {
         const dom = messageRef.current;
         if (dom) {
             requestAnimationFrame(() => {
                 dom.scrollTo(0, dom.scrollHeight);
             });
         }
-    },[messages,steamingMessage]);
+    }
+    useEffect(() => {
+        setTimeout(() => {
+            scrollToBottom();
+        }, 300)
+    }, [messages, steamingMessage]);
 
     return (
-        
-        <div  className="relative h-full overflow-x-none overflow-y-auto ">
+
+        <div className="relative h-full overflow-x-none overflow-y-auto ">
             <div className={'flex  h-full  gap-1.5 '}>
                 {messages.length <= 0 ?
                     <div className={'card m-auto color-gray-4 dark:color-gray-2 text-sm font-500 gap-1.2'}>
@@ -38,14 +43,14 @@ const MessageViewer = (props: MessageViewerProps) => {
                     </div>
                     : <div ref={messageRef} className={'chatbox'}>
                         {messages.map((msg, index) => (
-                            <div>
+                            <div key={index}>
                                 {msg.role === 'user' &&
-                                    <div key={index}
-                                         className={'chatitem dark:color-gray-2'}>
+                                    <div
+                                         className={'chatitem dark:color-gray-2 py-2'}>
                                         <span>{msg.content}</span>
                                     </div>}
                                 {msg.role === 'assistant' &&
-                                    <div key={index}
+                                    <div
                                          className={'chatitem  break-words group bg-gray-1 dark:bg-dark-3 dark:color-gray-2'}>
                                         {/*<pre>{formatText(msg.content || '')} </pre>*/}
                                         <Markdown markdown={msg.content}/>
@@ -53,11 +58,12 @@ const MessageViewer = (props: MessageViewerProps) => {
                             </div>
                         ))}
                         <div
+                            key={'asd'}
                             className={'chatitem  break-words group bg-gray-1 dark:bg-dark-3 dark:color-gray-2'}
                             style={{display: streaming ? '' : 'none'}}>
                             {
                                 steamingMessage ?
-                                    <Markdown markdown={steamingMessage}/>:
+                                    <Markdown markdown={steamingMessage}/> :
                                     <span className={'color-gray-3'}>Thinking...</span>
                             }
                         </div>

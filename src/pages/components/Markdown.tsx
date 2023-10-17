@@ -40,7 +40,7 @@ const Markdown = (props: MarkdownProps) => {
                 pre: (e) => {
                     return (<pre>{e.children}</pre>)
                 },
-                p: (pProps) => <p style={{whiteSpace:'pre-wrap'}} className={' overflow-hidden'} {...pProps} dir="auto"/>,
+                p: (pProps) => <p style={{whiteSpace:'pre-wrap'}} className={'line-height-[1.5] overflow-hidden'} {...pProps} dir="auto"/>,
                 a: (aProps) => {
                     const href = aProps.href || "";
                     const isInternal = /^\/#/i.test(href);

@@ -1,92 +1,22 @@
-//@ts-ignore
 import {toast} from 'react-toastify';
-import bots from "./bots.tsx";
-
-// import {toast} from 'react-toastify';
+import openAIParam from "./bots.tsx";
 import {useTheme} from '../../hooks'
-import {Button} from "../ui";
+import {Button, Input} from "../ui";
 import {configurations, currentConversationId, currentLanguage, saveConfiguration, switchLanguage} from "../../stores";
 import {useStore} from "@nanostores/react";
-import {useEffect} from "react";
+import {useEffect, useState} from "react";
 import {useI18n} from "../../hooks/useI18n.tsx";
-import {ConfigurationProps} from "../../stores/types/configuration.ts";
 
-
-interface BotDetail {
-    field: string
-    label: string
-    type: string
-    options?: string,
-    defaultValue?: string
-    tips?: string
-    step?: number
-    placeholder?: string
-}
-
-interface BotItemProp {
-    init: BotDetail,
-    data: ConfigurationProps,
-    changeValue: (v: string | number | boolean | object) => void
-}
-
-const Item = (props: BotItemProp) => {
-
-    const {init, data} = props
-    const field = init.field;
-    const getDataFieldValue = () => {
-        //@ts-ignore
-        return data[field] || ''
-    }
-    return (
-        <div className="p1">
-            <div className="mb1 color-gray gap-1.2 flex justify-between">{init.label}
-                {init.tips && <i className={'ri-question-line text-[15px]'} title={init.tips}> </i>}</div>
-
-            {init.type === 'text' && <input className={'bg-gray-1 p1 pl3 pr3 rd w-full dark:bg-dark-1'} type="text"
-                //@ts-ignore
-                                            value={getDataFieldValue() ? data[field] : ''}
-                                            autoComplete={'off'}
-                //@ts-ignore
-                                            onChange={e => props.changeValue(field, e.currentTarget.value)}
-                                            placeholder={init.placeholder}/>}
-            {init.type === 'number' && <input className={'bg-gray-1 p1 pl3 pr3 rd w-full dark:bg-dark-1'} type="number"
-                //@ts-ignore
-                                              value={data[field] ? data[field] : init.defaultValue}
-                                              autoComplete={'off'}
-                                              step={init.step ? init.step : 1}
-                //@ts-ignore
-                                              onChange={e => props.changeValue(field, e.currentTarget.value)}
-                                              placeholder={init.placeholder}/>}
-            {init.type === 'select' &&
-                <select className={'select bg-gray-1 p1 pl3 pr3 rd w-full dark:bg-dark-1'}
-                    //@ts-ignore
-                        value={data[field] ? data[field] : init.defaultValue}
-                    //@ts-ignore
-                        onChange={e => props.changeValue(field, e.target.value)}>
-
-                    {//@ts-ignore
-                        init.options.map((item, index) => (
-                            <option key={index} value={item.value}>
-                                {item.label}
-                            </option>
-                        ))}
-                </select>
-            }
-        </div>
-    )
-}
 
 const SettingPanel = () => {
     const [theme, setTheme] = useTheme()
-    const configuration = useStore(configurations)
+    const [configuration, setConfiguration] = useState(configurations.get())
     const $currentLanguage = useStore(currentLanguage)
     const conversationId = useStore(currentConversationId)
 
     const {t} = useI18n()
-
     useEffect(() => {
-        configurations.set(configuration)
-    }, [configuration])
+    }, []);
 
     const switchTheme = () => {
         const t = theme === 'dark' ? 'light' : 'dark'
@@ -101,13 +31,13 @@ const SettingPanel = () => {
         }
     }
 
-    const changeValue = (field: string, value: object) => {
-        const c: ConfigurationProps = {};
-        Object.assign(c, configuration);
+    const changConfigValues = (field: string, value: string | number | boolean | object) => {
+        const newData = {...configuration};
         //@ts-ignore
-        c[field] = value
-        configurations.set(c)
-
+        newData[field] = value
+        console.log(value)
+        // configurations.set(newData)
+        setConfiguration(newData)
     }
 
     const saveConfig = () => {
@@ -131,10 +61,25 @@ const SettingPanel = () => {
             </header>
             <div className="h-full px2 py2 overflow-x-hidden overflow-y-auto text-sm">
                 <div className="font-700 m1">OpenAI</div>
-                <div className="flex flex-col ">
-                    {bots.OpenAI.params.map((item, index: number) => (
-                        //@ts-ignore
-                        <Item key={index} init={item} data={configuration} changeValue={changeValue}/>
+                <div className="flex flex-col px-2">
+                    {openAIParam.map((item, index: number) => (
+                        <Input key={index}
+                               showValue={item.showValue}
+                               type={item.type}
+                               step={item.step}
+                               max={item.max}
+                               min={item.min}
+                               options={item.options}
+                               title={item.label}
+                               tips={item.tips}
+                            //@ts-ignore
+                               value={configuration[item.field]}
+                               onChange={(e) => {
+                                   //@ts-ignore
+                                   const val = item.type==='range' ? Number(e.currentTarget.value).toFixed(1) : e.currentTarget.value;
+                                   changConfigValues(item.field,val );
+                               }}
+                               placeholder={item.placeholder}/>
                     ))}
                 </div>
 

@@ -55,7 +55,6 @@ export const addConversation = async (data?: ConversationProps) => {
     }
     data.id = rowId
     await db.setItem(rowId, data)
-    initConversations()
     return data
 }
 export const selectConversation = async (cid: string) => {
@@ -64,4 +63,3 @@ export const selectConversation = async (cid: string) => {
     localStorage.setItem('currentConversation', cid)
 }
 
-initConversations()
