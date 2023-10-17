@@ -2,7 +2,14 @@ import {toast} from 'react-toastify';
 import openAIParam from "./bots.tsx";
 import {useTheme} from '../../hooks'
 import {Button, Input} from "../ui";
-import {configurations, currentConversationId, currentLanguage, saveConfiguration, switchLanguage} from "../../stores";
+import {
+    configurations,
+    currentConversationId,
+    currentLanguage, getConfiguration,
+    getMessagesByConversationId,
+    saveConfiguration,
+    switchLanguage
+} from "../../stores";
 import {useStore} from "@nanostores/react";
 import {useEffect, useState} from "react";
 import {useI18n} from "../../hooks/useI18n.tsx";
@@ -15,8 +22,13 @@ const SettingPanel = () => {
     const conversationId = useStore(currentConversationId)
 
     const {t} = useI18n()
+    const init = async () => {
+        const configs = await getConfiguration(conversationId);
+        setConfiguration(configs);
+    }
     useEffect(() => {
-    }, []);
+        init()
+    }, [conversationId])
 
     const switchTheme = () => {
         const t = theme === 'dark' ? 'light' : 'dark'
@@ -77,8 +89,8 @@ const SettingPanel = () => {
                                value={configuration[item.field]}
                                onChange={(e) => {
                                    //@ts-ignore
-                                   const val = item.type==='range' ? Number(e.currentTarget.value).toFixed(1) : e.currentTarget.value;
-                                   changConfigValues(item.field,val );
+                                   const val = item.type === 'range' ? Number(e.currentTarget.value).toFixed(1) : e.currentTarget.value;
+                                   changConfigValues(item.field, val);
                                }}
                                placeholder={item.placeholder}/>
                     ))}
