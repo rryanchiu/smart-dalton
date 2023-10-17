@@ -58,13 +58,12 @@ const MessageViewer = (props: MessageViewerProps) => {
                             </div>
                         ))}
                         <div
-                            key={'asd'}
                             className={'chatitem  break-words group bg-gray-1 dark:bg-dark-3 dark:color-gray-2'}
                             style={{display: streaming ? '' : 'none'}}>
                             {
                                 steamingMessage ?
                                     <Markdown markdown={steamingMessage}/> :
-                                    <span className={'color-gray-3'}>{t('thinking')}</span>
+                                    <span className={'color-gray-4'}>{t('thinking')}</span>
                             }
                         </div>
                     </div>

@@ -21,12 +21,11 @@ const Chat = () => {
     const conf = useStore(currentConfiguration)
     const [height, setHeight] = React.useState('50px');
     const [steamingMessage, setStreamingMessage] = React.useState('');
-    const [streaming, setStreaming] = React.useState(false);
+    const [streaming, setStreaming] = React.useState(true);
     const inputRef: React.RefObject<HTMLTextAreaElement> = useRef<HTMLTextAreaElement>(null);
     const {t} = useI18n()
 
     const [messages, setMessages] = React.useState<MessageProps[]>([]);
-
 
 
     useEffect(() => {
@@ -36,6 +35,12 @@ const Chat = () => {
     const init = async () => {
         const msgs = await getMessagesByConversationId(conversationId);
         setMessages(msgs);
+        setTimeout(() => {
+            if (inputRef.current) {
+                inputRef.current.focus()
+            }
+        }, 300)
+
     }
 
     const handleTextareaChange = (value: string) => {
@@ -115,8 +120,8 @@ const Chat = () => {
         })
         addMsg('user', finalMsg)
         setInputValue('')
-        if(inputRef.current) {
-            inputRef.current.value=''
+        if (inputRef.current) {
+            inputRef.current.value = ''
         }
         const config: OpenAIConfig = {
             stream: true,
@@ -171,7 +176,7 @@ const Chat = () => {
                 <KeyboardEventHandler
                     handleKeys={['ctrl + enter']}
                     onKeyEvent={() => {
-                       sendMessage()
+                        sendMessage()
                     }}>
                 <textarea
                     ref={inputRef}
@@ -181,13 +186,13 @@ const Chat = () => {
                     autoComplete="off"
                     placeholder={streaming ? t('thinking') : t('askmeanything')}
                     onInput={() => {
-                        const val = !inputRef.current ?'':inputRef.current.value;
+                        const val = !inputRef.current ? '' : inputRef.current.value;
                         handleTextareaChange(val);
                     }}/>
-                <Button className={'absolute right-5 bottom-7  '}
-                        disabled={streaming}
-                        type={'success'} size={'sm'} icon='ri-mail-send-fill'
-                        onClick={() => sendMessage()}/>
+                    <Button className={'absolute right-5 bottom-7  '}
+                            disabled={streaming}
+                            type={'success'} size={'sm'} icon='ri-mail-send-fill'
+                            onClick={() => sendMessage()}/>
                 </KeyboardEventHandler>
             </div>
         </div>

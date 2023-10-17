@@ -32,9 +32,9 @@ export const Input = ({
 
     if (type === 'select') {
         return (
-            <div className={className + 'flex flex-col py-2 pb2'}>
+            <div className={className + 'flex flex-col py-2 pb-[0.2rem]'}>
                 <div className={'flex mb2 justify-between'}>
-                    <span>{title}</span>
+                    <span className={'color-gray-6 dark:color-gray-1'}>{title}</span>
                 </div>
                 <select className={'select bg-gray-1 p2 rd w-full dark:bg-dark-1'}
                         value={value}
@@ -51,7 +51,7 @@ export const Input = ({
     return (
         <div className={className + 'flex flex-col py-2 pb-[0.2rem]'}>
             <div className={'flex mb1.2  justify-between'}>
-                <span className={'color-gray-6 dark:color-gray-1'}>{title}  </span>
+                <span className={'color-gray-6 dark:color-gray-1'}>{title}</span>
                 {showValue && <span className={'color-gray-4 font-sm'}>{value}</span>}
             </div>
             <span className={'color-gray-4 dark:color-gray-3 text-[13px]'}>{tips}</span>
