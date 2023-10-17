@@ -27,7 +27,7 @@ export const initConversations = async () => {
         localStorage.setItem('currentConversation', currentConversationId.get())
 
     }
-    switchConversation(currentConversationId.get())
+    await switchConversation(currentConversationId.get())
 
 }
 

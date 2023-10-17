@@ -42,6 +42,7 @@ const SettingPanel = () => {
 
     const saveConfig = () => {
         saveConfiguration(conversationId, configuration)
+        setConfiguration(configurations.get())
         toast('😉保存成功', {
             position: "top-center",
             autoClose: 3000,
