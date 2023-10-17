@@ -6,7 +6,7 @@ import {conversations, currentConversationId} from "../../stores/conversationSto
 import {useFullscreen, useI18n} from '../../hooks'
 import {useStore} from '@nanostores/react'
 import {chat, OpenAIConfig, RequestMessage} from "../../utils/openai.tsx";
-import {addMessage, configurations} from "../../stores";
+import {addMessage, currentConfiguration} from "../../stores";
 import {MessageProps} from "../../stores/types/message.ts";
 import {deleteMessagesByConversationId, getMessagesByConversationId} from "../../stores/messageStore.tsx"
 import MessageViewer from "./MessageViewer.tsx";
@@ -18,7 +18,7 @@ const Chat = () => {
     const [inputValue, setInputValue] = React.useState('')
     const conversationId = useStore(currentConversationId);
     const conversation = useStore(conversations);
-    const conf = useStore(configurations)
+    const conf = useStore(currentConfiguration)
     const [height, setHeight] = React.useState('50px');
     const [steamingMessage, setStreamingMessage] = React.useState('');
     const [streaming, setStreaming] = React.useState(false);
@@ -28,9 +28,6 @@ const Chat = () => {
     const [messages, setMessages] = React.useState<MessageProps[]>([]);
 
 
-    useEffect(() => {
-        configurations.set(conf)
-    }, [conf])
 
     useEffect(() => {
         init()

@@ -3,32 +3,23 @@ import openAIParam from "./bots.tsx";
 import {useTheme} from '../../hooks'
 import {Button, Input} from "../ui";
 import {
-    configurations,
+    currentConfiguration,
     currentConversationId,
-    currentLanguage, getConfiguration,
-    getMessagesByConversationId,
+    currentLanguage,
     saveConfiguration,
     switchLanguage
 } from "../../stores";
 import {useStore} from "@nanostores/react";
-import {useEffect, useState} from "react";
 import {useI18n} from "../../hooks/useI18n.tsx";
 
 
 const SettingPanel = () => {
     const [theme, setTheme] = useTheme()
-    const [configuration, setConfiguration] = useState(configurations.get())
     const $currentLanguage = useStore(currentLanguage)
     const conversationId = useStore(currentConversationId)
+    const configuration = useStore(currentConfiguration)
 
     const {t} = useI18n()
-    const init = async () => {
-        const configs = await getConfiguration(conversationId);
-        setConfiguration(configs);
-    }
-    useEffect(() => {
-        init()
-    }, [conversationId])
 
     const switchTheme = () => {
         const t = theme === 'dark' ? 'light' : 'dark'
@@ -47,14 +38,11 @@ const SettingPanel = () => {
         const newData = {...configuration};
         //@ts-ignore
         newData[field] = value
-        console.log(value)
-        // configurations.set(newData)
-        setConfiguration(newData)
+        currentConfiguration.set(newData)
     }
 
     const saveConfig = () => {
         saveConfiguration(conversationId, configuration)
-        setConfiguration(configurations.get())
         toast('😉保存成功', {
             position: "top-center",
             autoClose: 3000,

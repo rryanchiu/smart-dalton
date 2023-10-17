@@ -1,57 +1,57 @@
 import {db} from './db/configurations.ts'
 
 import type {ConfigurationProps} from "./types/configuration.ts";
-import {atom} from "nanostores";
+import {action, atom, map} from "nanostores";
 
-const defaultConfig = () => {
-    return {
-        apikey: '',
-        baseUrl: 'https://api.openai.com',
-        model: 'gpt-3.5-turbo',
-        top_p: 0.8,
-        temperature: 0.8,
-        max_tokens: 1024,
-        presence_penalty: 1,
-        frequency_penalty: 1
+const defaultConfig: ConfigurationProps = {
+    baseUrl: 'https://api.openai.com',
+    apikey: '',
+    model: 'gpt-3.5-turbo',
+    top_p: 0.8,
+    temperature: 0.8,
+    max_tokens: 1024,
+    presence_penalty: 1,
+    frequency_penalty: 1
+}
+
+export const configurationMap = map<Record<string, ConfigurationProps>>({})
+export const currentConfiguration = atom<ConfigurationProps>({})
+
+export const initConfigurations = async () => {
+    const data = await db.getMap() || {}
+    configurationMap.set(data)
+}
+
+export const deleteConfiguration = async (conversationId: string) => {
+    await db.deleteItem(conversationId)
+}
+
+export const getConfiguration = async (conversationId: string) => {
+    const config = configurationMap.get()[conversationId]
+    if (!config) {
+        await saveConfiguration(conversationId, defaultConfig)
+        await initConfigurations();
+        return configurationMap.get()[conversationId];
     }
+    return config;
 }
 
-export const configurations = atom<ConfigurationProps>({})
 
-export const getDefaultConfig = async () => {
-    const localConfig = await db.getItem('default')
-    if (localConfig) {
-        return localConfig;
-    }
-    return defaultConfig();
-}
+export const saveConfiguration = action(
+    configurationMap,
+    'addConfiguration',
+    (map, conversationId: string, config: ConfigurationProps) => {
+        map.setKey(conversationId, config)
+        db.setItem(conversationId, config)
+    },
+)
 
-export const saveConfiguration = async (key: string, config: ConfigurationProps) => {
-    await db.setItem(key, config)
-}
-
-export const deleteConfiguration = async (key: string) => {
-    await db.deleteItem(key)
-}
-
-export const getConfiguration = async (key: string) => {
-    const conf = await db.getItem(key)
-    if (!conf) {
-        const defaultConf = await getDefaultConfig();
-        await db.setItem(key, defaultConf)
-        return defaultConf
-    }
-    return conf;
-}
-
-export const switchConversation = async (cid: string) => {
-    const localConfig = await db.getItem(cid)
+export const selectConfiguration = async (conversationId: string) => {
+    const localConfig = await db.getItem(conversationId)
     if (!localConfig) {
-        const defaultConfig = await getDefaultConfig()
-        db.setItem(cid, defaultConfig)
-        configurations.set(defaultConfig)
-    } else {
-        configurations.set(localConfig)
+        await saveConfiguration(conversationId, defaultConfig)
+        await initConfigurations();
     }
+    currentConfiguration.set(configurationMap.get()[conversationId])
 }
 

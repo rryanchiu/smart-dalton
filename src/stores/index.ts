@@ -1,5 +1,6 @@
 import {initMessageStore} from "./messageStore.tsx";
 import {initConversations} from "./conversationStore.tsx";
+import {initConfigurations} from "./configurationStore.tsx";
 
 export * from './configurationStore.tsx'
 export * from './conversationStore.tsx'
@@ -8,6 +9,7 @@ export * from './i18nStore.tsx'
 
 export const initStores = async () => {
     console.log('init')
+    await initConfigurations()
     await initMessageStore()
     await initConversations();
 }

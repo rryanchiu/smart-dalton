@@ -16,6 +16,15 @@ const getItem = async (key: string) => {
     return null
 }
 
+
+const getMap = async () => {
+    if (store) {
+        const list = await entries(store)
+        return Object.fromEntries(list) as Record<string, ConfigurationProps>
+    }
+    return null
+}
+
 const updateItem = async (key: string, item: ConfigurationProps) => {
     if (store)
         await update(key, () => item, store)
@@ -38,6 +47,7 @@ const list = async () => {
 export const db = {
     getItem,
     setItem,
+    getMap,
     updateItem,
     deleteItem,
     list,

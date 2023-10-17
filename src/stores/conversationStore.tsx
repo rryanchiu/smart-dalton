@@ -2,7 +2,7 @@ import {atom} from 'nanostores'
 
 import {db} from "./db/conversations.ts";
 import type {ConversationProps} from "./types/conversation.ts";
-import {switchConversation} from "./configurationStore.tsx";
+import {selectConfiguration} from "./configurationStore.tsx";
 
 export const conversations = atom<ConversationProps[]>([])
 export const currentConversationId = atom('')
@@ -25,10 +25,8 @@ export const initConversations = async () => {
     } else if (dataList && dataList.length > 0) {
         currentConversationId.set(dataList[0].id)
         localStorage.setItem('currentConversation', currentConversationId.get())
-
     }
-    await switchConversation(currentConversationId.get())
-
+    await selectConfiguration(currentConversationId.get())
 }
 
 export const updateConversation = async (data: ConversationProps) => {
@@ -59,7 +57,7 @@ export const addConversation = async (data?: ConversationProps) => {
 }
 export const selectConversation = async (cid: string) => {
     currentConversationId.set(cid)
-    switchConversation(cid)
     localStorage.setItem('currentConversation', cid)
+    await selectConfiguration(cid)
 }
 

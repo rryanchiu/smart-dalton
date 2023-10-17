@@ -12,21 +12,14 @@ import {
 } from "../../stores/conversationStore.tsx"
 
 import {useI18n} from '../../hooks'
-import {useEffect, useState} from "react";
+import {useState} from "react";
 import {ConversationProps} from "../../stores/types/conversation.ts";
-import {configurations, getConfiguration} from "../../stores";
 
 const ConversationList = () => {
     const conversation = useStore(conversations)
     const conversationId = useStore(currentConversationId)
     const {t} = useI18n();
-    const reloadConfig = async () => {
-        configurations.set(await getConfiguration(conversationId))
-    }
 
-    useEffect(() => {
-        reloadConfig()
-    }, [conversationId])
 
     const [editingId, setEditingId] = useState('')
     const [editValue, setEditValue] = useState('')
