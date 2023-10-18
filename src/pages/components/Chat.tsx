@@ -21,7 +21,7 @@ const Chat = () => {
     const conf = useStore(currentConfiguration)
     const [height, setHeight] = React.useState('50px');
     const [steamingMessage, setStreamingMessage] = React.useState('');
-    const [streaming, setStreaming] = React.useState(true);
+    const [streaming, setStreaming] = React.useState(false);
     const inputRef: React.RefObject<HTMLTextAreaElement> = useRef<HTMLTextAreaElement>(null);
     const {t} = useI18n()
 
