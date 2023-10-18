@@ -50,10 +50,6 @@ const Chat = () => {
         }
 
 
-        console.log(inputRef.current.scrollHeight)
-        console.log(inputRef.current.clientHeight)
-        console.log(inputRef.current.offsetHeight)
-
         if (inputRef.current.scrollHeight > 144 && height != '144px') {
             setHeight('144px')
             return;
