@@ -55,13 +55,13 @@ const SettingPanel = () => {
         });
     }
     return (
-        <div className={'h-full flex flex-col'}>
+        <div className={'h-full flex flex-col dark:color-gray-3'}>
             <header className='header'>
                 <b>{t('settings')}</b>
                 <Button className="autoshow" onClick={hideSide} icon={'ri-close-line'}/>
             </header>
             <div className="h-full px2 py2 overflow-x-hidden overflow-y-auto text-sm">
-                <div className="font-700 m1">OpenAI</div>
+                <div className="font-700 m1 ">OpenAI</div>
                 <div className="flex flex-col px-2">
                     {openAIParam.map((item, index: number) => (
                         <Input key={index}

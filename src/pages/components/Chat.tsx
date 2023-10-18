@@ -121,11 +121,11 @@ const Chat = () => {
         }
         const config: OpenAIConfig = {
             stream: true,
-            top_p: conf.top_p,
+            top_p: Number(conf.top_p),
             model: conf.model || 'gpt-3.5-turbo',
-            temperature: conf.temperature,
-            presence_penalty: conf.presence_penalty,
-            frequency_penalty: conf.frequency_penalty
+            temperature: Number(conf.temperature),
+            presence_penalty: Number(conf.presence_penalty),
+            frequency_penalty: Number(conf.frequency_penalty)
         }
         chat({
             messages: sendMessages,
