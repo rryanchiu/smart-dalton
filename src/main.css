@@ -283,13 +283,32 @@ html.dark {
 .gradient-effect {
     content: ' ';
     bottom: 0;
-    height: 100%;
-    width: 60%;
+    height: 5px;
+    width: 100%;
     position: absolute;
     /* 背景图像为线性渐变效果 */
     /*background-image: linear-gradient(to right, #ccc, #999 ,#ccc );*/
 
-    background-image: linear-gradient(90deg, #ffffff00 0%, #efefef02 22%, #cccccc30 55%, #efefef02 80%, #ffffff00 100%);
+    /*background-image: linear-gradient(90deg, #ffffff00 0%, #efefef02 22%, #cccccc30 55%, #efefef02 80%, #ffffff00 100%);*/
+    background-image: linear-gradient(90deg, #ffa9f900 0%,  #ffa7ad10 30%, #ffa7ad50 50%, #ffa9f910 70%,  #ffa9f900 100%);
+    /* 设置背景图像重复滚动并指定时间和方式 */
+    animation-name: gradient-animation;
+    animation-duration: 2s;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+}
+
+.dark .gradient-effect {
+    content: ' ';
+    bottom: 0;
+    height: 5px;
+    width: 100%;
+    position: absolute;
+    /* 背景图像为线性渐变效果 */
+    /*background-image: linear-gradient(to right, #ccc, #999 ,#ccc );*/
+
+    /*background-image: linear-gradient(90deg, #ffffff00 0%, #efefef02 22%, #cccccc30 55%, #efefef02 80%, #ffffff00 100%);*/
+    background-image: linear-gradient(90deg, #ffa9f900 0%,  #ffa7ad10 30%, #ffa7ad20 50%, #ffa9f910 70%,  #ffa9f900 100%);
     /* 设置背景图像重复滚动并指定时间和方式 */
     animation-name: gradient-animation;
     animation-duration: 2s;
