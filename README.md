@@ -1,16 +1,25 @@
-# SmartDalton💬
 
-✨An awesome UI for talking to AI✨
+# Dalton💬
+
+✨An open source ChatGPT UI. ✨
 
 English / [简体中文](./README_CN.md)
 
 ## Live preview
 
-https://chatgpt.rryan.me
+https://chatgpt.ililili.me/
+
+
+## Deploy Immediately to Netlify
+
+[![Deploy to Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/rryanchiu/smart-dalton)
 
 ## Roadmap
 
--[ ] 
+- [x] Chat with AI
+- [ ] Default/Custom Prompt support
+- [ ] Export chat history/Share with picture
+- [ ] Support analysis and generation image 
 
 ## How to use
 
@@ -21,4 +30,4 @@ yarn dev
 
 ## Licence
 
-[MIT](https://)
+MIT © [Ryan](https://github.com/rryanchiu/smart-dalton/blob/main/LICENSE)

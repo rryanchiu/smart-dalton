@@ -142,6 +142,7 @@ const Chat = () => {
             },
             onError(error) {
                 console.error(error)
+                addMsg('assistant', error && error.message ? error.message : 'ERROR')
                 setStreaming(false)
                 init()
             }

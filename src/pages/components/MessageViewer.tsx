@@ -46,24 +46,28 @@ const MessageViewer = (props: MessageViewerProps) => {
                             <div key={index}>
                                 {msg.role === 'user' &&
                                     <div
-                                         className={'chatitem dark:color-gray-2 py-2'}>
+                                        className={'chatitem dark:color-gray-2 py-2'}>
                                         <span>{msg.content}</span>
                                     </div>}
                                 {msg.role === 'assistant' &&
                                     <div
-                                         className={'chatitem  break-words group bg-gray-1 dark:bg-dark-3 dark:color-gray-2'}>
+                                        className={'chatitem  break-words group bg-gray-1 dark:bg-dark-3 dark:color-gray-2'}>
                                         {/*<pre>{formatText(msg.content || '')} </pre>*/}
                                         <Markdown markdown={msg.content}/>
                                     </div>}
                             </div>
                         ))}
                         <div
-                            className={'chatitem  break-words group bg-gray-1 dark:bg-dark-3 dark:color-gray-2'}
+                            className={'chatitem  break-words group bg-gray-1 dark:bg-dark-3 dark:color-gray-2 overflow-hidden relative inline-table'}
                             style={{display: streaming ? '' : 'none'}}>
                             {
                                 steamingMessage ?
                                     <Markdown markdown={steamingMessage}/> :
-                                    <span className={'color-gray-4'}>{t('thinking')}</span>
+                                    <div className={' w-full h-full  flex '}>
+                                        <div className={'gradient-effect'}></div>
+                                        <span className={'color-gray-4 '}>
+                            {t('thinking')}</span>
+                                    </div>
                             }
                         </div>
                     </div>
