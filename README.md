@@ -9,6 +9,7 @@ English / [简体中文](./README_CN.md)
 
 https://chatgpt.ililili.me/
 
+![preview](https://raw.githubusercontent.com/rryanchiu/resources/main/20231022224139.jpg)
 
 ## Deploy Immediately to Netlify
 

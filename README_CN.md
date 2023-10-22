@@ -8,6 +8,8 @@ English | [简体中文](./README_CN.md)
 
 https://chatgpt.ililili.me/
 
+![preview](https://raw.githubusercontent.com/rryanchiu/resources/main/20231022224139.jpg)
+
 ## 部署到Netlify
 
 [![Deploy to Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/rryanchiu/smart-dalton)
