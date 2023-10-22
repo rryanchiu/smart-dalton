@@ -1,7 +1,10 @@
 import {KeyValuePair} from "../types/KeyValuePair.ts";
 
 export const en_us = {
+    actor: 'Actors',
+    chooseactor: '😀Choose an actor',
     settings: 'Settings',
+    savesucceed: '😀Saved',
     newconversation: 'New',
     askmeanything: 'Ask me anything😀',
     baseurl: 'Base URL',

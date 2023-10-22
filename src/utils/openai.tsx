@@ -1,9 +1,10 @@
 import {EventStreamContentType, fetchEventSource,} from "@microsoft/fetch-event-source";
 import {ConfigurationProps} from "../stores/types/configuration.ts";
+import {abortController} from "../stores/global.tsx";
 
 
 export interface RequestMessage {
-    role: 'system' | 'user' | 'assistant';
+    role: 'dalton' | 'system' | 'user' | 'assistant';
     content: string;
 }
 
@@ -20,7 +21,6 @@ export interface OpenAIReq {
     messages: RequestMessage[];
     settings: ConfigurationProps;
     config: OpenAIConfig;
-    // event
     onMessage?: (message: string, chunk: string) => void;
     onFinish: (message: string) => void;
     onError?: (err: Error) => void;
@@ -60,7 +60,10 @@ const chat = async (req: OpenAIReq) => {
     };
 
 
-    const controller = new AbortController();
+    let controller = abortController.get();
+    if (controller == null) {
+        controller = new AbortController()
+    }
 
     try {
         const chatPath = req.settings.baseUrl + "/v1/chat/completions";
@@ -71,9 +74,12 @@ const chat = async (req: OpenAIReq) => {
             headers: headers,
         };
 
-        // make a fetch request
         const requestTimeoutId = setTimeout(
-            () => controller.abort(),
+            () => {
+                if (controller != null) {
+                    controller.abort()
+                }
+            },
             60000,
         );
 
@@ -81,6 +87,7 @@ const chat = async (req: OpenAIReq) => {
         let finished = false;
 
         const close = () => {
+
             if (!finished) {
                 req.onFinish(message);
                 finished = true;

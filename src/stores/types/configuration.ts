@@ -7,4 +7,5 @@ export interface ConfigurationProps {
     max_tokens?: number
     presence_penalty?: number
     frequency_penalty?: number
+    actorId: string
 }

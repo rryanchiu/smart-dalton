@@ -31,7 +31,7 @@ export default defineConfig({
         'cardlist': 'fcc',
         'card': 'flex flex-col  w-full max-w-md mx-12 sm:mx-18 overflow-hidden m-auto p5 bg-gray-1 dark:bg-dark-1 b-dark-4 rd-2',
         'chatbox': 'flex flex-col  w-full overflow-x-hidden overflow-y-scroll dark:bg-dark-1 b-dark-4 p-2',
-        'chatitem': 'm-1  p-5 rd-2 color-dark-1  text-sm font-500 w-full ',
+        'chatitem': 'm-1  p-5 rd-2 color-dark-1   w-full ',
         'chattext': ' w-full color-dark-2 dark:color-gray-2 resize-vertical b-none  dark:bg-dark-1 bg-gray-1  pl5 pr25 pt3 pb3 rd-2 h-full',
 
         'btn': 'ml2 dark:bg-dark-2 dark:hover:bg-dark  rd-2 p1  hover:bg-gray-1 bg-gray-1 pl3 pr3 pt2 pb2 hover:bg-gray-2 ',

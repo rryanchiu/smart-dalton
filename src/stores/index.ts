@@ -8,7 +8,6 @@ export * from './messageStore.tsx'
 export * from './i18nStore.tsx'
 
 export const initStores = async () => {
-    console.log('init')
     await initConfigurations()
     await initMessageStore()
     await initConversations();

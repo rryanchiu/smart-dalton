@@ -36,7 +36,6 @@ const MessageViewer = (props: MessageViewerProps) => {
             <div className={'flex  h-full  gap-1.5 '}>
                 {messages.length <= 0 ?
                     <div className={'card m-auto color-gray-4 dark:color-gray-2 text-sm font-500 gap-1.2'}>
-
                         <span>{t('tips')}</span>
                         <span>{t('tipsline1')}</span>
                         <span>{t('tipsline2')}</span>
@@ -44,9 +43,14 @@ const MessageViewer = (props: MessageViewerProps) => {
                     : <div ref={messageRef} className={'chatbox'}>
                         {messages.map((msg, index) => (
                             <div key={index}>
+                                {msg.role === 'dalton' &&
+                                    <div
+                                        className={'chatitem dark:color-red-1 bg-red-100 dark-bg-dark-3 dark-color-red-1 py-2  text-[16px]'}>
+                                        <span>{msg.content}</span>
+                                    </div>}
                                 {msg.role === 'user' &&
                                     <div
-                                        className={'chatitem dark:color-gray-2 py-2'}>
+                                        className={'chatitem dark:color-gray-2 py-2  text-[16px]'}>
                                         <span>{msg.content}</span>
                                     </div>}
                                 {msg.role === 'assistant' &&

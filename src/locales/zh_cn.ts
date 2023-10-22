@@ -1,7 +1,10 @@
 import {KeyValuePair} from "../types/KeyValuePair.ts";
 
 export const zh_cn = {
+    actor: '预设',
+    chooseactor: '😀选择预设',
     settings: '设置',
+    savesucceed: '😀已保存',
     newconversation: '新对话',
     askmeanything: '有问题尽管问！😀',
     baseurl: 'Base URL',
@@ -9,7 +12,12 @@ export const zh_cn = {
     model: 'Model',
     temperature: 'Temperature',
     topp: 'Top P',
+    tips_top_p: 'Saved',
     maxtokens: 'Max Tokens',
+    tips_temperature: 'Saved',
+    tips_max_tokens: '数值越大，答案越随机',
+    tips_presence_penalty: 'Saved',
+    tips_frequency_penalty: 'Saved',
     save: '保存',
     send: '发送',
     savesuccess: 'Saved',

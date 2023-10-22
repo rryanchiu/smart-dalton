@@ -1,6 +1,5 @@
 import ReactMarkdown from 'react-markdown';
 import gfm from 'remark-gfm'
-// import {Prism as SyntaxHighlighter} from 'react-syntax-highlighter'
 import SyntaxHighlighter from 'react-syntax-highlighter';
 
 // import {default as codeTheme} from 'react-syntax-highlighter/dist/esm/styles/hljs/hybrid';
@@ -40,12 +39,12 @@ const Markdown = (props: MarkdownProps) => {
                 pre: (e) => {
                     return (<pre>{e.children}</pre>)
                 },
-                p: (pProps) => <p style={{whiteSpace:'pre-wrap'}} className={'line-height-[1.5] overflow-hidden dark:color-gray-3'} {...pProps} dir="auto"/>,
+                p: (pProps) => <p style={{whiteSpace:'pre-wrap'}} className={'line-height-[1.6] text-[16px] dark:color-gray-3 '+pProps.className?pProps.className:''} {...pProps} dir="auto"/>,
                 a: (aProps) => {
                     const href = aProps.href || "";
                     const isInternal = /^\/#/i.test(href);
                     const target = isInternal ? "_self" : aProps.target ?? "_blank";
-                    return <a {...aProps} target={target}/>;
+                    return <a {...aProps} target={target} className={'color-blue'}/>;
                 },
             }}
         >

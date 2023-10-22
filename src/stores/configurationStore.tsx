@@ -6,6 +6,7 @@ import {action, atom, map} from "nanostores";
 const defaultConfig: ConfigurationProps = {
     baseUrl: 'https://api.openai.com',
     apikey: '',
+    actorId: 'no_actor',
     model: 'gpt-3.5-turbo',
     top_p: 0.8,
     temperature: 0.8,
@@ -15,6 +16,7 @@ const defaultConfig: ConfigurationProps = {
 }
 
 export const configurationMap = map<Record<string, ConfigurationProps>>({})
+//@ts-ignore
 export const currentConfiguration = atom<ConfigurationProps>({})
 
 export const initConfigurations = async () => {

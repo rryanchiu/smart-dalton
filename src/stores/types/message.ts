@@ -3,7 +3,7 @@ export interface MessageProps {
     conversationId: string
     messageId: string
     createTime?: number
-    role?: 'system' | 'user' | 'assistant'
+    role?: 'dalton' |'system' | 'user' | 'assistant'
     code?: number
     msg?: string
     content?: string

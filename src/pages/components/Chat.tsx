@@ -11,11 +11,14 @@ import {MessageProps} from "../../stores/types/message.ts";
 import {deleteMessagesByConversationId, getMessagesByConversationId} from "../../stores/messageStore.tsx"
 import MessageViewer from "./MessageViewer.tsx";
 import KeyboardEventHandler from 'react-keyboard-event-handler';
+import {map} from "nanostores";
+import {actors} from "../../config/actors.tsx";
+import {abortController, initActor} from "../../stores/global.tsx";
+import {ActorProp} from "../../types/ActorProp.ts";
 
 const Chat = () => {
     const [fullscreen, setFullscreen] = useFullscreen()
 
-    const [inputValue, setInputValue] = React.useState('')
     const conversationId = useStore(currentConversationId);
     const conversation = useStore(conversations);
     const conf = useStore(currentConfiguration)
@@ -24,9 +27,41 @@ const Chat = () => {
     const [streaming, setStreaming] = React.useState(false);
     const inputRef: React.RefObject<HTMLTextAreaElement> = useRef<HTMLTextAreaElement>(null);
     const {t} = useI18n()
+    const initActorStatus = useStore(initActor);
+
+    useEffect(() => {
+        if (initActor.get()) {
+            sendInitActorMessage();
+        }
+    }, [initActorStatus]);
 
     const [messages, setMessages] = React.useState<MessageProps[]>([]);
 
+
+    const actorMap = map<Record<string, ActorProp>>({})
+
+    const getActorContentById = (id: string) => {
+        const item = actorMap.get()[id];
+        if (item) {
+            return item.content;
+        }
+
+        for (const actor of actors) {
+            if (actor.id === id) {
+                actorMap.setKey(id, actor)
+                return actor.content;
+            }
+        }
+        return '';
+    }
+    const getActorConfById = (id: string) => {
+        const item = actorMap.get()[id];
+        if (item && item.config) {
+            return item.config;
+        }
+
+        return conf;
+    }
 
     useEffect(() => {
         init()
@@ -40,24 +75,7 @@ const Chat = () => {
                 inputRef.current.focus()
             }
         }, 300)
-
     }
-
-    const handleTextareaChange = (value: string) => {
-        setInputValue(value);
-        if (!inputRef.current) {
-            return
-        }
-
-
-        if (inputRef.current.scrollHeight > 144 && height != '144px') {
-            setHeight('144px')
-            return;
-        }
-        if (inputRef.current.scrollHeight > inputRef.current.offsetHeight) {
-            setHeight(inputRef.current.scrollHeight + 'px')
-        }
-    };
 
 
     const getConversationName = (cid: string) => {
@@ -74,7 +92,7 @@ const Chat = () => {
             element.classList.add('side-show');
         }
     }
-    const addMsg = (role: 'user' | 'assistant' | 'system', message: string, code?: number) => {
+    const addMsg = async (role: 'dalton' | 'user' | 'assistant' | 'system', message: string, code?: number) => {
         const rowId = 'id_' + Date.now()
         const messageBody: MessageProps = {
             id: rowId,
@@ -85,21 +103,40 @@ const Chat = () => {
             content: message,
             code: code || 0
         }
-        addMessage(conversationId, messageBody)
+        await addMessage(conversationId, messageBody);
         init()
     }
+    const stopChat = () => {
+        const controller = abortController.get();
+        if (controller != null) {
+            controller.abort("stop");
+        }
+    }
     const sendMessage = () => {
-        const finalMsg = inputValue.trim();
+        if (!inputRef.current) {
+            return
+        }
+        const controller = new AbortController();
+        abortController.set(controller)
+        const finalMsg = inputRef.current.value.trim();
         if (!finalMsg || finalMsg === '') {
             return;
         }
         if (!conf.apikey) {
-            addMsg('assistant', t('tipsline1'))
+            addMsg('dalton', t('tipsline1'))
             return
         }
+        inputRef.current.blur()
         setStreaming(true)
         const sendMessages: RequestMessage[] = [];
-        const msgs = messages.slice(-10);
+        if (conf.actorId && !conf.actorId.includes('no_actor')) {
+            sendMessages.push({
+                role: 'system',
+                content: getActorContentById(conf.actorId)
+            })
+        }
+        const filteredMessages = messages.filter(message => message.role !== 'dalton');
+        const msgs = filteredMessages.slice(-10);
         for (const msgItem of msgs) {
             if (!msgItem.role || !msgItem.content) {
                 continue
@@ -109,23 +146,22 @@ const Chat = () => {
                 content: msgItem.content
             })
         }
-
         sendMessages.push({
             role: 'user',
             content: finalMsg
         })
         addMsg('user', finalMsg)
-        setInputValue('')
         if (inputRef.current) {
             inputRef.current.value = ''
         }
+        const actorConf = getActorConfById(conf.actorId);
         const config: OpenAIConfig = {
             stream: true,
-            top_p: Number(conf.top_p),
-            model: conf.model || 'gpt-3.5-turbo',
-            temperature: Number(conf.temperature),
-            presence_penalty: Number(conf.presence_penalty),
-            frequency_penalty: Number(conf.frequency_penalty)
+            top_p: Number(actorConf.top_p),
+            model: actorConf.model || 'gpt-3.5-turbo',
+            temperature: Number(actorConf.temperature),
+            presence_penalty: Number(actorConf.presence_penalty),
+            frequency_penalty: Number(actorConf.frequency_penalty)
         }
         chat({
             messages: sendMessages,
@@ -135,7 +171,8 @@ const Chat = () => {
                 setStreamingMessage(message)
             },
             onFinish(message) {
-                addMsg('assistant', message)
+                if (message)
+                    addMsg('assistant', message)
                 setStreaming(false)
                 setStreamingMessage("")
                 init()
@@ -145,6 +182,71 @@ const Chat = () => {
                 addMsg('assistant', error && error.message ? error.message : 'ERROR')
                 setStreaming(false)
                 init()
+            }
+        })
+    }
+
+    const sendInitActorMessage = async () => {
+        if (!inputRef.current) {
+            return
+        }
+        const controller = new AbortController();
+        abortController.set(controller)
+        const finalMsg =  getActorContentById(conf.actorId)
+        if (!finalMsg || finalMsg === '') {
+            return;
+        }
+        if (!conf.apikey) {
+            addMsg('dalton', t('tipsline1'))
+            return
+        }
+        inputRef.current.blur()
+        setStreaming(true)
+        const sendMessages: RequestMessage[] = [];
+        sendMessages.push({
+            role: 'user',
+            content: finalMsg
+        })
+        sendMessages.push({
+            role: 'user',
+            content: finalMsg
+        })
+        addMsg('user', finalMsg)
+        if (inputRef.current) {
+            inputRef.current.value = ''
+        }
+        const actorConf = getActorConfById(conf.actorId);
+        const config: OpenAIConfig = {
+            stream: true,
+            top_p: Number(actorConf.top_p),
+            model: actorConf.model || 'gpt-3.5-turbo',
+            temperature: Number(actorConf.temperature),
+            presence_penalty: Number(actorConf.presence_penalty),
+            frequency_penalty: Number(actorConf.frequency_penalty)
+        }
+
+        chat({
+            messages: sendMessages,
+            settings: conf,
+            config: config,
+            onMessage(message) {
+                setStreamingMessage(message)
+                initActor.set(false)
+            },
+            onFinish(message) {
+                if (message)
+                    addMsg('assistant', message)
+                setStreaming(false)
+                setStreamingMessage("")
+                init()
+                initActor.set(false)
+            },
+            onError(error) {
+                console.error(error)
+                addMsg('assistant', error && error.message ? error.message : 'ERROR')
+                setStreaming(false)
+                init()
+                initActor.set(false)
             }
         })
     }
@@ -182,14 +284,17 @@ const Chat = () => {
                     disabled={streaming}
                     autoComplete="off"
                     placeholder={streaming ? t('thinking') : t('askmeanything')}
-                    onInput={() => {
-                        const val = !inputRef.current ? '' : inputRef.current.value;
-                        handleTextareaChange(val);
-                    }}/>
-                    <Button className={'absolute right-5 bottom-7  '}
-                            disabled={streaming}
-                            type={'success'} size={'sm'} icon='ri-mail-send-fill'
-                            onClick={() => sendMessage()}/>
+                    onFocus={() => setHeight('144px')}
+                    onBlur={() => setHeight('50px')}
+                />
+                    {streaming ? <Button className={'absolute right-5 bottom-7  '}
+                                         type={'danger'} size={'sm'} icon='ri-stop-mini-fill'
+                                         onClick={stopChat}/>
+                        : <Button className={'absolute right-5 bottom-7  '}
+                                  type={'success'} size={'sm'} icon='ri-mail-send-fill'
+                                  onClick={() => sendMessage()}/>
+                    }
+
                 </KeyboardEventHandler>
             </div>
         </div>

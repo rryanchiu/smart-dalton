@@ -16,6 +16,7 @@ export const getMessagesByConversationId = (conversationId: string) => {
 
 export const deleteMessagesByConversationId =async (conversationId: string) => {
     await db.deleteItem(conversationId);
+    messageMap.setKey(conversationId,[])
 }
 
 export const addMessage = action(
