@@ -69,7 +69,7 @@ const ConversationList = () => {
                     <Button className='autoshow' icon={'ri-close-line'} onClick={hideSide}/>
                 </div>
             </header>
-            <div className={"list grow "}>
+            <div className={"list grow color-dark-2 dark:color-gray-1"}>
                 {conversation.map((item, index) => (
                     <div key={index}
                          className=
