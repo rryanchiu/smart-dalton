@@ -111,37 +111,6 @@ body {
     }
 }
 
-@media (prefers-color-scheme: dark) {
-    :root {
-        --c-bg: #212121;
-        --c-scroll: #333333;
-        --c-scroll-hover: #555555;
-        --color-border: #333335;
-        background-color: #212121;
-        color-scheme: dark;
-    }
-
-    ::-webkit-scrollbar {
-        width: 6px;
-        height: 6px;
-    }
-
-    ::-webkit-scrollbar-thumb {
-        background-color: var(--c-scroll);
-        border-radius: 4px;
-    }
-
-    ::-webkit-scrollbar-thumb:hover {
-        background-color: var(--c-scroll-hover);
-    }
-
-    ::-webkit-scrollbar-track {
-        background-color: var(--c-bg);
-    }
-
-
-}
-
 ::-webkit-scrollbar {
     width: 6px;
     height: 6px;
