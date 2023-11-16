@@ -69,11 +69,9 @@ body {
         border-radius: 0 !important;
     }
 
-    .sidebar {
-    }
+    .sidebar {}
 
-    .mask {
-    }
+    .mask {}
 
     .autoshow {
         display: inline;
@@ -106,6 +104,7 @@ body {
     from {
         transform: rotate(0deg);
     }
+
     to {
         transform: rotate(360deg);
     }
@@ -141,6 +140,7 @@ body {
     0% {
         transform: translateX(100%);
     }
+
     100% {
         transform: translateX(0);
     }
@@ -182,6 +182,7 @@ html.dark {
     from {
         left: -60%;
     }
+
     to {
         left: 110%;
     }
@@ -224,6 +225,27 @@ html.dark {
     animation-iteration-count: infinite;
 }
 
-ol, ul{
-    list-style: initial !important;
+
+
+@media (min-width: 640px) {
+    .sm {}
 }
+
+.myul {
+    list-style-type: disc;
+    padding-left: 10px;
+}
+
+.myol {
+    padding-left: 20px;
+    list-style-type: decimal;
+
+}
+
+.myli {
+    padding-left: 6px;
+}
+/* 
+.myli p {
+    font-weight: 600 !important;
+} */
