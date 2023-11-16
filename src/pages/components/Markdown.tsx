@@ -44,8 +44,17 @@ const Markdown = (props: MarkdownProps) => {
                     const href = aProps.href || "";
                     const isInternal = /^\/#/i.test(href);
                     const target = isInternal ? "_self" : aProps.target ?? "_blank";
-                    return <a {...aProps} target={target} className={'color-blue'}/>;
+                    return <a {...aProps} target={target} className={'color-blue'} />;
                 },
+                ul: (e) => {
+                    return (<ul className='myul'>{e.children}</ul>)
+                },
+                li: (e) => {
+                    return (<li  className='myli'>{e.children}</li>)
+                }, 
+                ol: (e) => {
+                    return (<ol  className='myol'>{e.children}</ol>)
+                }
             }}
         >
             {props.markdown || ''}
