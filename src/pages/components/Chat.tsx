@@ -10,7 +10,6 @@ import {addMessage, currentConfiguration} from "../../stores";
 import {MessageProps} from "../../stores/types/message.ts";
 import {deleteMessagesByConversationId, getMessagesByConversationId} from "../../stores/messageStore.tsx"
 import MessageViewer from "./MessageViewer.tsx";
-import KeyboardEventHandler from 'react-keyboard-event-handler';
 import {map} from "nanostores";
 import {actors} from "../../config/actors.tsx";
 import {abortController, initActor} from "../../stores/global.tsx";
@@ -192,7 +191,7 @@ const Chat = () => {
         }
         const controller = new AbortController();
         abortController.set(controller)
-        const finalMsg =  getActorContentById(conf.actorId)
+        const finalMsg = getActorContentById(conf.actorId)
         if (!finalMsg || finalMsg === '') {
             return;
         }
@@ -250,6 +249,23 @@ const Chat = () => {
             }
         })
     }
+
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            const isMac = navigator.platform.toLowerCase().includes('mac');
+            const isCommandOrCtrlPressed = isMac ? e.metaKey : e.ctrlKey;
+
+            if (isCommandOrCtrlPressed && e.key === 'Enter') {
+                e.preventDefault();
+                sendMessage();
+            }
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [sendMessage]);
+
+
     return (
         <div className={'h-full flex flex-col '}>
             <header className='header'>
@@ -272,11 +288,7 @@ const Chat = () => {
             </header>
             <MessageViewer messages={messages} streaming={streaming} streamingMessage={steamingMessage}/>
             <div style={{position: 'sticky'}} className="absolute bottom-0 w-full border-t-1 p3 dark:border-dark-1">
-                <KeyboardEventHandler
-                    handleKeys={['ctrl + enter']}
-                    onKeyEvent={() => {
-                        sendMessage()
-                    }}>
+
                 <textarea
                     ref={inputRef}
                     className={'chattext inputtext resize-none'}
@@ -287,15 +299,14 @@ const Chat = () => {
                     onFocus={() => setHeight('144px')}
                     onBlur={() => setHeight('50px')}
                 />
-                    {streaming ? <Button className={'absolute right-5 bottom-7  '}
-                                         type={'danger'} size={'sm'} icon='ri-stop-mini-fill'
-                                         onClick={stopChat}/>
-                        : <Button className={'absolute right-5 bottom-7  '}
-                                  type={'success'} size={'sm'} icon='ri-mail-send-fill'
-                                  onClick={() => sendMessage()}/>
-                    }
+                {streaming ? <Button className={'absolute right-5 bottom-7  '}
+                                     type={'danger'} size={'sm'} icon='ri-stop-mini-fill'
+                                     onClick={stopChat}/>
+                    : <Button className={'absolute right-5 bottom-7  '}
+                              type={'success'} size={'sm'} icon='ri-mail-send-fill'
+                              onClick={() => sendMessage()}/>
+                }
 
-                </KeyboardEventHandler>
             </div>
         </div>
     )
